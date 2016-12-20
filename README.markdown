@@ -1,6 +1,6 @@
 # IDMPhotoBrowser ![](http://cocoapod-badges.herokuapp.com/v/IDMPhotoBrowser/badge.png) ![](http://cocoapod-badges.herokuapp.com/p/IDMPhotoBrowser/badge.png)
 
-IDMPhotoBrowser is a new implementation based on [MWPhotoBrowser](https://github.com/mwaterfall/MWPhotoBrowser).
+IDMPhotoBrowser is a new implementation based on [MWPhotoBrowser](https://github.com/mwaterfall/MWPhotoBrowser). This is a fork that allows integration with ImageFeedCollectionViewController (coming soon), or a custom implementation of a data source as opposed to a fixed array.
 
 We've added both user experience and technical features inspired by Facebook's and Tweetbot's photo browsers.
 
