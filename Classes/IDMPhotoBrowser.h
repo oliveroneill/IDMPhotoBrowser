@@ -72,7 +72,7 @@
 // Init
 - (id)initWithPhotos:(NSArray *)photosArray;
 
-// Init with data source
+// Init with data source, for more flexibility over a fixed array
 - (id)initWithDataSource:(NSObject<IDMPhotoDataSource> *)photoDataSource;
 
 // Init (animated from view)
