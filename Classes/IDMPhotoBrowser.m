@@ -953,6 +953,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
                     IDMLog(@"Pre-loading image at index %i", pageIndex+1);
                 }
             }
+            // load images from data source if it's set
             if (_source){
                 // load more images if we're 5 from the end and the number of
                 // photos is greater than 5 from the last time we loaded images
@@ -966,6 +967,12 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
             }
         }
     }
+}
+
+#pragma mark - IDMPhotoDataSource Loading Notification
+
+- (void) imagesLoaded {
+    [self reloadData];
 }
 
 #pragma mark - IDMPhoto Loading Notification
