@@ -21,6 +21,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 @interface IDMPhotoBrowser () {
 	// Data
     NSMutableArray *_photos;
+    NSObject<IDMPhotoDataSource> *_source;
 
 	// Views
 	UIScrollView *_pagingScrollView;
@@ -73,6 +74,9 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 	// iOS 7
     UIViewController *_applicationTopViewController;
     int _previousModalPresentationStyle;
+
+    // used to keep track of the last set of images loaded
+    @private NSUInteger loadedImageIndex;
 }
 
 // Private Properties
@@ -190,6 +194,8 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
         _isdraggingPhoto = NO;
 
+        loadedImageIndex = -1;
+
 		if ([self respondsToSelector:@selector(automaticallyAdjustsScrollViewInsets)]) {
             self.automaticallyAdjustsScrollViewInsets = NO;
 		}
@@ -215,6 +221,13 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 		_photos = [[NSMutableArray alloc] initWithArray:photosArray];
 	}
 	return self;
+}
+
+- (id)initWithDataSource:(NSObject<IDMPhotoDataSource> *)photoDataSource {
+    if ((self = [self init])) {
+        _source = photoDataSource;
+    }
+    return self;
 }
 
 - (id)initWithPhotos:(NSArray *)photosArray animatedFromView:(UIView*)view {
@@ -249,7 +262,11 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 }
 
 - (void)releaseAllUnderlyingPhotos {
-    for (id p in _photos) { if (p != [NSNull null]) [p unloadUnderlyingImage]; } // Release photos
+    NSArray *photos = _photos;
+    if (_source) {
+        photos = [_source getPhotos];
+    }
+    for (id p in photos) { if (p != [NSNull null]) [p unloadUnderlyingImage]; } // Release photos
 }
 
 - (void)didReceiveMemoryWarning {
@@ -868,11 +885,19 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 }
 
 - (NSUInteger)numberOfPhotos {
-    return _photos.count;
+    NSArray *photos = _photos;
+    if (_source) {
+        photos = [_source getPhotos];
+    }
+    return photos.count;
 }
 
 - (id<IDMPhoto>)photoAtIndex:(NSUInteger)index {
-    return _photos[index];
+    NSArray *photos = _photos;
+    if (_source) {
+        photos = [_source getPhotos];
+    }
+    return photos[index];
 }
 
 - (IDMCaptionView *)captionViewForPhotoAtIndex:(NSUInteger)index {
@@ -926,6 +951,17 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
                 if (![photo underlyingImage]) {
                     [photo loadUnderlyingImageAndNotify];
                     IDMLog(@"Pre-loading image at index %i", pageIndex+1);
+                }
+            }
+            if (_source){
+                // load more images if we're 5 from the end and the number of
+                // photos is greater than 5 from the last time we loaded images
+                if ((pageIndex > [self numberOfPhotos] - 5)
+                    && ([self numberOfPhotos] > loadedImageIndex + 5)) {
+                    // use loadedImageIndex to determine whether there are
+                    // actually no more images
+                    loadedImageIndex = pageIndex;
+                    [_source loadMoreImages:self];
                 }
             }
         }

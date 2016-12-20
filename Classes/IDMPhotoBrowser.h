@@ -12,6 +12,8 @@
 #import "IDMPhoto.h"
 #import "IDMPhotoProtocol.h"
 #import "IDMCaptionView.h"
+#import "IDMPhotoDataSource.h"
+#import "IDMBrowserDelegate.h"
 
 // Delgate
 @class IDMPhotoBrowser;
@@ -27,7 +29,7 @@
 @end
 
 // IDMPhotoBrowser
-@interface IDMPhotoBrowser : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate>
+@interface IDMPhotoBrowser : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate, IDMBrowserDelegate>
 
 // Properties
 @property (nonatomic, strong) id <IDMPhotoBrowserDelegate> delegate;
@@ -70,6 +72,9 @@
 
 // Init
 - (id)initWithPhotos:(NSArray *)photosArray;
+
+// Init with data source
+- (id)initWithDataSource:(NSObject<IDMPhotoDataSource> *)photoDataSource;
 
 // Init (animated from view)
 - (id)initWithPhotos:(NSArray *)photosArray animatedFromView:(UIView*)view;
