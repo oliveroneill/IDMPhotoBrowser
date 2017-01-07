@@ -1,5 +1,5 @@
 //
-//  IDMPhotoBrowserDelegate.h
+//  IDMBrowserDelegate.h
 //  Pods
 //
 //  Created by Oliver ONeill on 10/12/2016.
