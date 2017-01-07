@@ -1423,4 +1423,5 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 	}
 }
 
+-(void)displayImageFailure:(UIImageView*)imageView {}
 @end
