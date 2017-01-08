@@ -149,8 +149,6 @@
 
 - (void)displayImageFailure {
     [_progressView removeFromSuperview];
-    [_photoBrowser displayImageFailure:_photoImageView];
-    [self setNeedsLayout];
 }
 
 #pragma mark - Setup
