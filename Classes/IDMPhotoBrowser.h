@@ -28,6 +28,7 @@
 - (void)photoBrowser:(IDMPhotoBrowser *)photoBrowser didDismissActionSheetWithButtonIndex:(NSUInteger)buttonIndex photoIndex:(NSUInteger)photoIndex;
 - (IDMCaptionView *)photoBrowser:(IDMPhotoBrowser *)photoBrowser captionViewForPhotoAtIndex:(NSUInteger)index;
 - (void)photoBrowser:(IDMPhotoBrowser *)photoBrowser imageFailed:(NSUInteger)index imageView:(IDMTapDetectingImageView *)imageView;
+- (void)photoBrowser:(IDMPhotoBrowser *)photoBrowser setupToolbar:(NSUInteger)index toolbar:(UIToolbar *) toolbar;
 @end
 
 // IDMPhotoBrowser

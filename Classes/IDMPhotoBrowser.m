@@ -860,6 +860,9 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
     [_toolbar setItems:items];
 	[self updateToolbar];
+    if ([_delegate respondsToSelector:@selector(photoBrowser:setupToolbar:toolbar:)]) {
+        [_delegate photoBrowser:self setupToolbar:_currentPageIndex toolbar:_toolbar];
+    }
 
     // Content offset
 	_pagingScrollView.contentOffset = [self contentOffsetForPageAtIndex:_currentPageIndex];
