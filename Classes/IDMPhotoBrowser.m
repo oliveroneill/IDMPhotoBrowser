@@ -211,6 +211,10 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
                                                  selector:@selector(handleIDMPhotoLoadingDidEndNotification:)
                                                      name:IDMPhoto_LOADING_DID_END_NOTIFICATION
                                                    object:nil];
+
+        // turn off memory caching to avoid excessive memory usage
+        SDWebImageManager *manager = [SDWebImageManager sharedManager];
+        manager.imageCache.shouldCacheImagesInMemory = NO;
     }
 	
     return self;
@@ -959,6 +963,13 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
                     // actually no more images
                     loadedImageIndex = pageIndex;
                     [_source loadMoreImages:self];
+                }
+                int toRemove = 20;
+                // clear old images
+                if ([self numberOfPhotos] > toRemove) {
+                    for (int i = 0; i < toRemove; i++) {
+                        [[_source getPhotos][i] unloadUnderlyingImage];
+                    }
                 }
             }
         }
