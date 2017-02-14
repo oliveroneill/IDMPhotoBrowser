@@ -695,7 +695,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     [_panGesture setMaximumNumberOfTouches:1];
 
     // Update
-    //[self reloadData];
+    [self reloadData];
 
 	// Super
     [super viewDidLoad];
@@ -703,7 +703,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
 - (void)viewWillAppear:(BOOL)animated {
     // Update
-    [self reloadData];
+//    [self reloadData];
 
 
     if ([_delegate respondsToSelector:@selector(willAppearPhotoBrowser:)]) {
