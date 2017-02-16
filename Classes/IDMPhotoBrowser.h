@@ -96,4 +96,7 @@
 // Get IDMPhoto at index
 - (id<IDMPhoto>)photoAtIndex:(NSUInteger)index;
 
+// Add view that will be hidden on touch
+-(void)addToolbarView:(UIView *)view;
+
 @end

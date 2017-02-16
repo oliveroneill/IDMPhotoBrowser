@@ -42,6 +42,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 	UIBarButtonItem *_previousButton, *_nextButton, *_actionButton;
     UIBarButtonItem *_counterButton;
     UILabel *_counterLabel;
+    NSMutableArray *_toolbarViews;
 
     // Actions
     UIActionSheet *_actionsSheet;
@@ -163,6 +164,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         _visiblePages = [NSMutableSet new];
         _recycledPages = [NSMutableSet new];
         _photos = [NSMutableArray new];
+        _toolbarViews = [NSMutableArray new];
 
         _initalPageIndex = 0;
         _autoHide = YES;
@@ -976,6 +978,11 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     }
 }
 
+-(void)addToolbarView:(UIView *)view {
+    [_toolbarViews addObject:view];
+    [self.view addSubview:view];
+}
+
 #pragma mark - IDMPhotoDataSource Loading Notification
 
 - (void) imagesLoaded {
@@ -1266,6 +1273,9 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     NSMutableSet *captionViews = [[NSMutableSet alloc] initWithCapacity:_visiblePages.count];
     for (IDMZoomingScrollView *page in _visiblePages) {
         if (page.captionView) [captionViews addObject:page.captionView];
+    }
+    for (UIView *view in _toolbarViews)  {
+        [captionViews addObject:view];
     }
 
     // Hide/show bars
