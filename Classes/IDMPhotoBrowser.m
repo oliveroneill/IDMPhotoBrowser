@@ -939,6 +939,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         // If page is current page then initiate loading of previous and next pages
         NSUInteger pageIndex = PAGE_INDEX(page);
         if (_currentPageIndex == pageIndex) {
+            // Preload photos
             if (pageIndex > 0) {
                 // Preload index - 1
                 id <IDMPhoto> photo = [self photoAtIndex:pageIndex-1];
@@ -955,7 +956,24 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
                     IDMLog(@"Pre-loading image at index %i", pageIndex+1);
                 }
             }
-            // load images from data source if it's set
+            // Unload photos
+            if (pageIndex < [self numberOfPhotos] - 2) {
+                // Unload index + 2
+                id <IDMPhoto> photo = [self photoAtIndex:pageIndex+2];
+                if ([photo underlyingImage]) {
+                    [photo unloadUnderlyingImage];
+                    IDMLog(@"Unloading image at index %i", pageIndex+2);
+                }
+            }
+            if (pageIndex > 1) {
+                // Preload index - 2
+                id <IDMPhoto> photo = [self photoAtIndex:pageIndex-2];
+                if ([photo underlyingImage]) {
+                    [photo unloadUnderlyingImage];
+                    IDMLog(@"Unloading image at index2 %i", pageIndex-2);
+                }
+            }
+            // Load images from data source if it's set
             if (_source){
                 // load more images if we're 5 from the end and the number of
                 // photos is greater than 5 from the last time we loaded images
