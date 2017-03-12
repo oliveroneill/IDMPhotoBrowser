@@ -9,6 +9,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "IDMPhotoBrowser.h"
 #import "IDMZoomingScrollView.h"
+#import "SDImageCacheConfig.h"
 
 #import "pop/POP.h"
 
@@ -216,7 +217,8 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
         // turn off memory caching to avoid excessive memory usage
         SDWebImageManager *manager = [SDWebImageManager sharedManager];
-        manager.imageCache.shouldCacheImagesInMemory = NO;
+        SDImageCacheConfig *config = manager.imageCache.config;
+        config.shouldCacheImagesInMemory = NO;
     }
 	
     return self;
