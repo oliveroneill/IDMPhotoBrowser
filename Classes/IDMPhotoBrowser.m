@@ -9,7 +9,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import "IDMPhotoBrowser.h"
 #import "IDMZoomingScrollView.h"
-#import "SDImageCacheConfig.h"
 
 #import "pop/POP.h"
 

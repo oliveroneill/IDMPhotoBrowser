@@ -16,6 +16,8 @@
 #import "IDMBrowserDelegate.h"
 #import "IDMTapDetectingImageView.h"
 
+#import <SDWebImage/SDImageCacheConfig.h>
+
 // Delgate
 @class IDMPhotoBrowser;
 @protocol IDMPhotoBrowserDelegate <NSObject>
