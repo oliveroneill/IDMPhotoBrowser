@@ -946,40 +946,48 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         // If page is current page then initiate loading of previous and next pages
         NSUInteger pageIndex = PAGE_INDEX(page);
         if (_currentPageIndex == pageIndex) {
-            // Preload photos
-            if (pageIndex > 0) {
-                // Preload index - 1
-                id <IDMPhoto> photo = [self photoAtIndex:pageIndex-1];
-                if (![photo underlyingImage]) {
-                    [photo loadUnderlyingImageAndNotify];
-                    IDMLog(@"Pre-loading image at index %i", pageIndex-1);
+            // preload and unload images in background
+            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0ul);
+            dispatch_async(queue, ^{
+                // Preload photos
+                if (pageIndex > 0) {
+                    // Preload index - 1
+                    id <IDMPhoto> photo = [self photoAtIndex:pageIndex-1];
+                    if (![photo underlyingImage]) {
+                        dispatch_sync(dispatch_get_main_queue(), ^{
+                            [photo loadUnderlyingImageAndNotify];
+                            IDMLog(@"Pre-loading image at index %i", pageIndex-1);
+                        });
+                    }
                 }
-            }
-            if (pageIndex < [self numberOfPhotos] - 1) {
-                // Preload index + 1
-                id <IDMPhoto> photo = [self photoAtIndex:pageIndex+1];
-                if (![photo underlyingImage]) {
-                    [photo loadUnderlyingImageAndNotify];
-                    IDMLog(@"Pre-loading image at index %i", pageIndex+1);
+                if (pageIndex < [self numberOfPhotos] - 1) {
+                    // Preload index + 1
+                    id <IDMPhoto> photo = [self photoAtIndex:pageIndex+1];
+                    if (![photo underlyingImage]) {
+                        dispatch_sync(dispatch_get_main_queue(), ^{
+                            [photo loadUnderlyingImageAndNotify];
+                            IDMLog(@"Pre-loading image at index %i", pageIndex+1);
+                        });
+                    }
                 }
-            }
-            // Unload photos
-            if (pageIndex < [self numberOfPhotos] - 2) {
-                // Unload index + 2
-                id <IDMPhoto> photo = [self photoAtIndex:pageIndex+2];
-                if ([photo underlyingImage]) {
-                    [photo unloadUnderlyingImage];
-                    IDMLog(@"Unloading image at index %i", pageIndex+2);
+                // Unload photos
+                if (pageIndex < [self numberOfPhotos] - 2) {
+                    // Unload index + 2
+                    id <IDMPhoto> photo = [self photoAtIndex:pageIndex+2];
+                    if ([photo underlyingImage]) {
+                        [photo unloadUnderlyingImage];
+                        IDMLog(@"Unloading image at index %i", pageIndex+2);
+                    }
                 }
-            }
-            if (pageIndex > 1) {
-                // Preload index - 2
-                id <IDMPhoto> photo = [self photoAtIndex:pageIndex-2];
-                if ([photo underlyingImage]) {
-                    [photo unloadUnderlyingImage];
-                    IDMLog(@"Unloading image at index2 %i", pageIndex-2);
+                if (pageIndex > 1) {
+                    // Preload index - 2
+                    id <IDMPhoto> photo = [self photoAtIndex:pageIndex-2];
+                    if ([photo underlyingImage]) {
+                        [photo unloadUnderlyingImage];
+                        IDMLog(@"Unloading image at index2 %i", pageIndex-2);
+                    }
                 }
-            }
+            });
             // Load images from data source if it's set
             if (_source){
                 // load more images if we're 5 from the end and the number of
@@ -990,13 +998,6 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
                     // actually no more images
                     loadedImageIndex = pageIndex;
                     [_source loadMoreImages:self];
-                }
-                int toRemove = 20;
-                // clear old images
-                if ([self numberOfPhotos] > toRemove) {
-                    for (int i = 0; i < toRemove; i++) {
-                        [[_source getPhotos][i] unloadUnderlyingImage];
-                    }
                 }
             }
         }
