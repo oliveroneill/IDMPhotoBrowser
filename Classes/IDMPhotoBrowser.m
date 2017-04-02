@@ -944,49 +944,31 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 - (void)loadAdjacentPhotosIfNecessary:(id<IDMPhoto>)photo {
     IDMZoomingScrollView *page = [self pageDisplayingPhoto:photo];
     if (page) {
-        // If page is current page then initiate loading of previous and next pages
-        NSUInteger pageIndex = PAGE_INDEX(page);
+        // If page is current page then initiate loading of previous and next
+        // pages
+        int pageIndex = (int)PAGE_INDEX(page);
         if (_currentPageIndex == pageIndex) {
             // preload and unload images in background
             dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0ul);
             dispatch_async(queue, ^{
+                int numberOfPhotos = (int)[self numberOfPhotos];
                 // Preload photos
                 if (pageIndex > 0) {
                     // Preload index - 1
-                    id <IDMPhoto> photo = [self photoAtIndex:pageIndex-1];
-                    if (![photo underlyingImage]) {
-                        dispatch_sync(dispatch_get_main_queue(), ^{
-                            [photo loadUnderlyingImageAndNotify];
-                            IDMLog(@"Pre-loading image at index %i", pageIndex-1);
-                        });
-                    }
+                    [self loadAtIndex:pageIndex - 1];
                 }
-                if (pageIndex < [self numberOfPhotos] - 1) {
+                if (pageIndex < numberOfPhotos - 1) {
                     // Preload index + 1
-                    id <IDMPhoto> photo = [self photoAtIndex:pageIndex+1];
-                    if (![photo underlyingImage]) {
-                        dispatch_sync(dispatch_get_main_queue(), ^{
-                            [photo loadUnderlyingImageAndNotify];
-                            IDMLog(@"Pre-loading image at index %i", pageIndex+1);
-                        });
-                    }
+                    [self loadAtIndex:pageIndex + 1];
                 }
                 // Unload photos
-                if (pageIndex < [self numberOfPhotos] - 2) {
+                if (pageIndex < numberOfPhotos - 2) {
                     // Unload index + 2
-                    id <IDMPhoto> photo = [self photoAtIndex:pageIndex+2];
-                    if ([photo underlyingImage]) {
-                        [photo unloadUnderlyingImage];
-                        IDMLog(@"Unloading image at index %i", pageIndex+2);
-                    }
+                    [self unloadAtIndex:pageIndex + 2];
                 }
                 if (pageIndex > 1) {
                     // Preload index - 2
-                    id <IDMPhoto> photo = [self photoAtIndex:pageIndex-2];
-                    if ([photo underlyingImage]) {
-                        [photo unloadUnderlyingImage];
-                        IDMLog(@"Unloading image at index2 %i", pageIndex-2);
-                    }
+                    [self unloadAtIndex:pageIndex - 2];
                 }
             });
             // Load images from data source if it's set
@@ -1002,6 +984,24 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
                 }
             }
         }
+    }
+}
+
+-(void)loadAtIndex:(NSUInteger)index {
+    id <IDMPhoto> photo = [self photoAtIndex:index];
+    if (![photo underlyingImage]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [photo loadUnderlyingImageAndNotify];
+            IDMLog(@"Pre-loading image at index %i", index);
+        });
+    }
+}
+
+-(void)unloadAtIndex:(NSUInteger)index {
+    id <IDMPhoto> photo = [self photoAtIndex:index];
+    if ([photo underlyingImage]) {
+        [photo unloadUnderlyingImage];
+        IDMLog(@"Unloading image at index %i", index);
     }
 }
 
