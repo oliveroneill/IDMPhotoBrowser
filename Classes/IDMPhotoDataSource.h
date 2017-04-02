@@ -23,8 +23,12 @@
  */
 - (void)loadMoreImages:(id<IDMBrowserDelegate>)browser;
 /**
- * Returns the current set of photos. This should grow in length when
+ * Returns the photo at the current index
+ */
+- (id<IDMPhoto>)photoAtIndex:(NSUInteger)index;
+/**
+ * Returns the number of photos available. This number should increase when
  * `loadMoreImages` is called.
  */
-- (NSArray *)getPhotos;
+- (int)numberOfPhotos;
 @end

@@ -269,11 +269,11 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 }
 
 - (void)releaseAllUnderlyingPhotos {
-    NSArray *photos = _photos;
-    if (_source) {
-        photos = [_source getPhotos];
+    // Release photos
+    for (int i = 0; i < [self numberOfPhotos]; i++) {
+        id p = [self photoAtIndex:i];
+        if (p != [NSNull null]) [p unloadUnderlyingImage];
     }
-    for (id p in photos) { if (p != [NSNull null]) [p unloadUnderlyingImage]; } // Release photos
 }
 
 - (void)didReceiveMemoryWarning {
@@ -895,19 +895,17 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 }
 
 - (NSUInteger)numberOfPhotos {
-    NSArray *photos = _photos;
     if (_source) {
-        photos = [_source getPhotos];
+        return [_source numberOfPhotos];
     }
-    return photos.count;
+    return [_photos count];
 }
 
 - (id<IDMPhoto>)photoAtIndex:(NSUInteger)index {
-    NSArray *photos = _photos;
     if (_source) {
-        photos = [_source getPhotos];
+        return [_source photoAtIndex:index];
     }
-    return photos[index];
+    return _photos[index];
 }
 
 - (IDMCaptionView *)captionViewForPhotoAtIndex:(NSUInteger)index {
@@ -1048,10 +1046,11 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 	CGRect visibleBounds = _pagingScrollView.bounds;
 	NSInteger iFirstIndex = (NSInteger) floorf((CGRectGetMinX(visibleBounds)+PADDING*2) / CGRectGetWidth(visibleBounds));
 	NSInteger iLastIndex  = (NSInteger) floorf((CGRectGetMaxX(visibleBounds)-PADDING*2-1) / CGRectGetWidth(visibleBounds));
+    NSUInteger maxVal = [self numberOfPhotos] - 1;
     if (iFirstIndex < 0) iFirstIndex = 0;
-    if (iFirstIndex > [self numberOfPhotos] - 1) iFirstIndex = [self numberOfPhotos] - 1;
+    if (iFirstIndex > maxVal) iFirstIndex = maxVal;
     if (iLastIndex < 0) iLastIndex = 0;
-    if (iLastIndex > [self numberOfPhotos] - 1) iLastIndex = [self numberOfPhotos] - 1;
+    if (iLastIndex > maxVal) iLastIndex = maxVal;
 
 	// Recycle no longer needed pages
     NSInteger pageIndex;
@@ -1228,8 +1227,9 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     // Calculate current page
     CGRect visibleBounds = _pagingScrollView.bounds;
     NSInteger index = (NSInteger) (floorf(CGRectGetMidX(visibleBounds) / CGRectGetWidth(visibleBounds)));
+    NSUInteger maxVal = [self numberOfPhotos] - 1;
     if (index < 0) index = 0;
-    if (index > [self numberOfPhotos] - 1) index = [self numberOfPhotos] - 1;
+    if (index > maxVal) index = maxVal;
     NSUInteger previousCurrentPage = _currentPageIndex;
     _currentPageIndex = index;
     if (_currentPageIndex != previousCurrentPage) {
