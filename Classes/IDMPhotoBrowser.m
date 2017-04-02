@@ -945,11 +945,11 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         // If page is current page then initiate loading of previous and next
         // pages
         int pageIndex = (int)PAGE_INDEX(page);
+        int numberOfPhotos = (int)[self numberOfPhotos];
         if (_currentPageIndex == pageIndex) {
             // preload and unload images in background
             dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0ul);
             dispatch_async(queue, ^{
-                int numberOfPhotos = (int)[self numberOfPhotos];
                 // Preload photos
                 if (pageIndex > 0) {
                     // Preload index - 1
@@ -973,13 +973,16 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
             if (_source){
                 // load more images if we're 5 from the end and the number of
                 // photos is greater than 5 from the last time we loaded images
-                if ((pageIndex > [self numberOfPhotos] - 5)
-                    && ([self numberOfPhotos] > loadedImageIndex + 5)) {
-                    // use loadedImageIndex to determine whether there are
-                    // actually no more images
-                    loadedImageIndex = pageIndex;
-                    [_source loadMoreImages:self];
-                }
+                // If we've reached the last photo then we must reload since
+                // there may be less than 5 photos
+                if ((pageIndex > numberOfPhotos - 5)
+                    && ((numberOfPhotos > loadedImageIndex + 5) ||
+                        (pageIndex == numberOfPhotos - 1))) {
+                        // use loadedImageIndex to determine whether there are
+                        // actually no more images
+                        loadedImageIndex = pageIndex;
+                        [_source loadMoreImages:self];
+                    }
             }
         }
     }
