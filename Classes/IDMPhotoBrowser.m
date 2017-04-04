@@ -63,6 +63,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 	BOOL _rotating;
     BOOL _viewIsActive; // active as in it's in the view heirarchy
     BOOL _autoHide;
+    BOOL _adjustScrollAfterReload;
     NSInteger _initalPageIndex;
 
     BOOL _isdraggingPhoto;
@@ -161,6 +162,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 		_performingLayout = NO; // Reset on view did appear
 		_rotating = NO;
         _viewIsActive = NO;
+        _adjustScrollAfterReload = NO;
         _visiblePages = [NSMutableSet new];
         _recycledPages = [NSMutableSet new];
         _photos = [NSMutableArray new];
@@ -892,6 +894,12 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
     // Layout
     [self.view setNeedsLayout];
+
+    // if we're scrolling while the reload occurs then we need to adjust when
+    // the scroll stops. This is done in `scrollDidEndDecelerating`
+    if (_pagingScrollView.frame.origin.x != [self contentOffsetForPageAtIndex:_currentPageIndex].x) {
+        _adjustScrollAfterReload = YES;
+    }
 }
 
 - (NSUInteger)numberOfPhotos {
@@ -1252,6 +1260,14 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
 	// Update toolbar when page changes
 	if(! _arrowButtonsChangePhotosAnimated) [self updateToolbar];
+    if (_adjustScrollAfterReload) {
+        // scroll to the current image - this fixes a bug where adding new data
+        // while scrolling can leave the view halfway between two images
+        CGRect frame = _pagingScrollView.frame;
+        frame.origin = [self contentOffsetForPageAtIndex:_currentPageIndex];
+        [_pagingScrollView scrollRectToVisible:frame animated:YES];
+    }
+    _adjustScrollAfterReload = NO;
 }
 
 #pragma mark - Toolbar
