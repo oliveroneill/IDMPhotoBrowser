@@ -825,6 +825,10 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     NSUInteger numberOfPhotos = [self numberOfPhotos];
 
 	// Setup pages
+    // Remove views first to avoid adding twice
+    for (IDMZoomingScrollView *page in _visiblePages) {
+        [page removeFromSuperview];
+    }
     [_visiblePages removeAllObjects];
     [_recycledPages removeAllObjects];
 
