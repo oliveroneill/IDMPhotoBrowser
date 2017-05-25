@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name          =  "OOPhotoBrowser"
   s.summary       =  "Photo Browser / Viewer inspired by Facebook's and Tweetbot's with ARC support, swipe-to-dismiss, image progress and more."
-  s.version       =  "2.0.1"
+  s.version       =  "2.0.2"
   s.homepage      =  "https://github.com/oliveroneill/OOPhotoBrowser"
   s.license       =  { :type => 'MIT', :file => 'LICENSE.txt' }
   s.author        =  { "Oliver ONeill" => "oliveroneill@users.noreply.github.com" }
