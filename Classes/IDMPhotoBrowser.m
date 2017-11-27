@@ -200,6 +200,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         
         _doneButtonRightInset = 20.f;
         _doneButtonTopInset = 30.f;
+
         _doneButtonSize = CGSizeMake(55.f, 26.f);
 
         loadedImageIndex = -1;
@@ -1214,6 +1215,10 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     if ([self isLandscape:orientation])
         height = 32;
 
+    if (@available(iOS 11.0, *)) {
+        height += self.view.safeAreaInsets.bottom;
+    }
+
     return CGRectMake(0, self.view.bounds.size.height - height, self.view.bounds.size.width, height);
 }
 
@@ -1223,7 +1228,12 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
     // if ([self isLandscape:orientation]) screenWidth = screenBound.size.height;
 
-    return CGRectMake(screenWidth - self.doneButtonRightInset - self.doneButtonSize.width, self.doneButtonTopInset, self.doneButtonSize.width, self.doneButtonSize.height);
+    CGFloat topInset = self.doneButtonTopInset;
+    if (@available(iOS 11.0, *)) {
+        topInset += self.view.safeAreaInsets.top;
+    }
+
+    return CGRectMake(screenWidth - self.doneButtonRightInset - self.doneButtonSize.width, topInset, self.doneButtonSize.width, self.doneButtonSize.height);
 }
 
 - (CGRect)frameForCaptionView:(IDMCaptionView *)captionView atIndex:(NSUInteger)index {
