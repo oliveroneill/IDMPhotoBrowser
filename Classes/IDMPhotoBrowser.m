@@ -1230,7 +1230,10 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
     CGFloat topInset = self.doneButtonTopInset;
     if (@available(iOS 11.0, *)) {
-        topInset += self.view.safeAreaInsets.top;
+        // To avoid the done button from moving when the status bar is toggled
+        // on and off
+        CGFloat offset = [UIApplication sharedApplication].isStatusBarHidden ? 0 : -20;
+        topInset += self.view.safeAreaInsets.top + offset;
     }
 
     return CGRectMake(screenWidth - self.doneButtonRightInset - self.doneButtonSize.width, topInset, self.doneButtonSize.width, self.doneButtonSize.height);
