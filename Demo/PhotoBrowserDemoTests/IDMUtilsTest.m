@@ -43,7 +43,7 @@
     CGRect rect = CGRectMake(0, 0, 100, 200);
     CGRect bounds = rect;
     // no inset changes
-    UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, 0, 0);
+    UIEdgeInsets insets = UIEdgeInsetsZero;
     BOOL adjust = YES;
     int statusBarHeight = 0;
     // when
@@ -58,7 +58,7 @@
     CGRect rect = CGRectMake(0, 0, 100, 200);
     // small bounds should not affect the view
     CGRect bounds = CGRectMake(10, 10, 10, 20);
-    UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, 0, 0);
+    UIEdgeInsets insets = UIEdgeInsetsZero;
     BOOL adjust = YES;
     int statusBarHeight = 0;
     // when
@@ -102,7 +102,7 @@
     // given
     CGRect rect = CGRectMake(0, 0, 100, 200);
     CGRect bounds = CGRectMake(0, 0, 100, 200);
-    UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, 0, 0);
+    UIEdgeInsets insets = UIEdgeInsetsZero;
     BOOL adjust = YES;
     int statusBarHeight = 10;
     // when
