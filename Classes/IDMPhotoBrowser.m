@@ -66,6 +66,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     BOOL _autoHide;
     BOOL _adjustScrollAfterReload;
     NSInteger _initalPageIndex;
+    CGFloat _statusBarHeight;
 
     BOOL _isdraggingPhoto;
 
@@ -199,6 +200,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
         _isdraggingPhoto = NO;
         
+        _statusBarHeight = 20.f;
         _doneButtonRightInset = 20.f;
         // relative to status bar and safeAreaInsets
         _doneButtonTopInset = 10.f;
@@ -1258,7 +1260,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 }
 
 - (CGRect)adjustForSafeArea:(CGRect)rect adjustForStatusBar:(BOOL)adjust forInsets:(UIEdgeInsets) insets {
-    return [IDMUtils adjustRect:rect forSafeAreaInsets:insets forBounds:self.view.bounds adjustForStatusBar:adjust statusBarHeight:[UIApplication sharedApplication].statusBarFrame.size.height];
+    return [IDMUtils adjustRect:rect forSafeAreaInsets:insets forBounds:self.view.bounds adjustForStatusBar:adjust statusBarHeight:_statusBarHeight];
 }
 
 #pragma mark - UIScrollView Delegate
