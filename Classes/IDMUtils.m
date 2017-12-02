@@ -49,4 +49,26 @@
     }
     return rect;
 }
+
+/**
+ * Find the UIViewController's safeAreaInsets, since individual UIView's only
+ * account for portions that are covered
+ */
++ (UIEdgeInsets) getSafeAreaInsetsFromView:(UIView*) view {
+    // We can go through the hierarchy to find valid safeAreaInsets by checking
+    // each parent for non-zero insets
+    if (@available(iOS 11.0, *)) {
+        // stop once we reach a view controller
+        while (![view isKindOfClass:[UIViewController class]]) {
+            // Once we find non-zero values we can stop
+            if (!UIEdgeInsetsEqualToEdgeInsets(view.safeAreaInsets, UIEdgeInsetsZero)) {
+                break;
+            }
+            if (view.superview == NULL) break;
+            view = view.superview;
+        }
+        return view.safeAreaInsets;
+    }
+    return UIEdgeInsetsZero;
+}
 @end

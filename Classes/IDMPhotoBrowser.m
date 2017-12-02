@@ -507,8 +507,13 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
     CGSize imageSize = image.size;
 
-    CGFloat maxWidth = CGRectGetWidth(_applicationWindow.bounds);
-    CGFloat maxHeight = CGRectGetHeight(_applicationWindow.bounds);
+    CGRect bounds = _applicationWindow.bounds;
+    // adjust bounds as the photo browser does
+    if (@available(iOS 11.0, *)) {
+        bounds = [self adjustForSafeArea:bounds adjustForStatusBar:NO forInsets:[IDMUtils getSafeAreaInsetsFromView:_senderViewForAnimation]];
+    }
+    CGFloat maxWidth = CGRectGetWidth(bounds);
+    CGFloat maxHeight = CGRectGetHeight(bounds);
 
     CGRect animationFrame = CGRectZero;
 
@@ -1247,11 +1252,15 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 
 - (CGRect)adjustForSafeArea:(CGRect)rect adjustForStatusBar:(BOOL)adjust {
     if (@available(iOS 11.0, *)) {
-        return [IDMUtils adjustRect:rect forSafeAreaInsets:self.view.safeAreaInsets forBounds:self.view.bounds adjustForStatusBar:adjust statusBarHeight:[UIApplication sharedApplication].statusBarFrame.size.height];
-    } else {
-        return rect;
+        return [self adjustForSafeArea:rect adjustForStatusBar:adjust forInsets:self.view.safeAreaInsets];
     }
+    return rect;
 }
+
+- (CGRect)adjustForSafeArea:(CGRect)rect adjustForStatusBar:(BOOL)adjust forInsets:(UIEdgeInsets) insets {
+    return [IDMUtils adjustRect:rect forSafeAreaInsets:insets forBounds:self.view.bounds adjustForStatusBar:adjust statusBarHeight:[UIApplication sharedApplication].statusBarFrame.size.height];
+}
+
 #pragma mark - UIScrollView Delegate
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView  {
