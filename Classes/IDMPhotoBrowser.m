@@ -9,6 +9,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "IDMPhotoBrowser.h"
 #import "IDMZoomingScrollView.h"
+#import "IDMUtils.h"
 
 #import "pop/POP.h"
 
@@ -199,7 +200,8 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         _isdraggingPhoto = NO;
         
         _doneButtonRightInset = 20.f;
-        _doneButtonTopInset = 30.f;
+        // relative to status bar and safeAreaInsets
+        _doneButtonTopInset = 10.f;
 
         _doneButtonSize = CGSizeMake(55.f, 26.f);
 
@@ -524,7 +526,6 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     if (!presenting) {
         animationFrame.origin.y += scrollView.frame.origin.y;
     }
-
     return animationFrame;
 }
 
@@ -1177,6 +1178,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     CGRect frame = self.view.bounds;
     frame.origin.x -= PADDING;
     frame.size.width += (2 * PADDING);
+    frame = [self adjustForSafeArea:frame adjustForStatusBar:false];
     return frame;
 }
 
@@ -1215,39 +1217,41 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     if ([self isLandscape:orientation])
         height = 32;
 
-    if (@available(iOS 11.0, *)) {
-        height += self.view.safeAreaInsets.bottom;
-    }
-
-    return CGRectMake(0, self.view.bounds.size.height - height, self.view.bounds.size.width, height);
+    CGRect rtn = CGRectMake(0, self.view.bounds.size.height - height, self.view.bounds.size.width, height);
+    rtn = [self adjustForSafeArea:rtn adjustForStatusBar:true];
+    return rtn;
 }
 
 - (CGRect)frameForDoneButtonAtOrientation:(UIInterfaceOrientation)orientation {
     CGRect screenBound = self.view.bounds;
     CGFloat screenWidth = screenBound.size.width;
 
-    // if ([self isLandscape:orientation]) screenWidth = screenBound.size.height;
-
-    CGFloat topInset = self.doneButtonTopInset;
-    if (@available(iOS 11.0, *)) {
-        // To avoid the done button from moving when the status bar is toggled
-        // on and off
-        CGFloat offset = [UIApplication sharedApplication].isStatusBarHidden ? 0 : -20;
-        topInset += self.view.safeAreaInsets.top + offset;
-    }
-
-    return CGRectMake(screenWidth - self.doneButtonRightInset - self.doneButtonSize.width, topInset, self.doneButtonSize.width, self.doneButtonSize.height);
+    CGRect rtn = CGRectMake(screenWidth - self.doneButtonRightInset - self.doneButtonSize.width, self.doneButtonTopInset, self.doneButtonSize.width, self.doneButtonSize.height);
+    rtn = [self adjustForSafeArea:rtn adjustForStatusBar:true];
+    return rtn;
 }
 
 - (CGRect)frameForCaptionView:(IDMCaptionView *)captionView atIndex:(NSUInteger)index {
     CGRect pageFrame = [self frameForPageAtIndex:index];
 
+    CGFloat insetOffset = 0;
+    if (@available(iOS 11.0, *)) {
+        insetOffset += self.view.safeAreaInsets.bottom;
+    }
+
     CGSize captionSize = [captionView sizeThatFits:CGSizeMake(pageFrame.size.width, 0)];
-    CGRect captionFrame = CGRectMake(pageFrame.origin.x, pageFrame.size.height - captionSize.height - (_toolbar.superview?_toolbar.frame.size.height:0), pageFrame.size.width, captionSize.height);
+    CGRect captionFrame = CGRectMake(pageFrame.origin.x, pageFrame.size.height - captionSize.height - (_toolbar.superview?_toolbar.frame.size.height:0) - insetOffset, pageFrame.size.width, captionSize.height);
 
     return captionFrame;
 }
 
+- (CGRect)adjustForSafeArea:(CGRect)rect adjustForStatusBar:(BOOL)adjust {
+    if (@available(iOS 11.0, *)) {
+        return [IDMUtils adjustRect:rect forSafeAreaInsets:self.view.safeAreaInsets forBounds:self.view.bounds adjustForStatusBar:adjust statusBarHeight:[UIApplication sharedApplication].statusBarFrame.size.height];
+    } else {
+        return rect;
+    }
+}
 #pragma mark - UIScrollView Delegate
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView  {
