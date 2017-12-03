@@ -512,7 +512,13 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     CGRect bounds = _applicationWindow.bounds;
     // adjust bounds as the photo browser does
     if (@available(iOS 11.0, *)) {
-        bounds = [self adjustForSafeArea:bounds adjustForStatusBar:NO forInsets:[IDMUtils getSafeAreaInsetsFromView:_senderViewForAnimation]];
+        // use the windows safe area inset
+        UIWindow *window = [UIApplication sharedApplication].keyWindow;
+        UIEdgeInsets insets = UIEdgeInsetsZero;
+        if (window != NULL) {
+            insets = window.safeAreaInsets;
+        }
+        bounds = [self adjustForSafeArea:bounds adjustForStatusBar:NO forInsets:insets];
     }
     CGFloat maxWidth = CGRectGetWidth(bounds);
     CGFloat maxHeight = CGRectGetHeight(bounds);
