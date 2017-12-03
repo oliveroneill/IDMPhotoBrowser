@@ -514,7 +514,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     if (@available(iOS 11.0, *)) {
         // use the windows safe area inset
         UIWindow *window = [UIApplication sharedApplication].keyWindow;
-        UIEdgeInsets insets = UIEdgeInsetsZero;
+        UIEdgeInsets insets = UIEdgeInsetsMake(_statusBarHeight, 0, 0, 0);
         if (window != NULL) {
             insets = window.safeAreaInsets;
         }
@@ -1254,7 +1254,8 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     if (@available(iOS 11.0, *)) {
         return [self adjustForSafeArea:rect adjustForStatusBar:adjust forInsets:self.view.safeAreaInsets];
     }
-    return rect;
+    UIEdgeInsets insets = UIEdgeInsetsMake(_statusBarHeight, 0, 0, 0);
+    return [self adjustForSafeArea:rect adjustForStatusBar:adjust forInsets:insets];
 }
 
 - (CGRect)adjustForSafeArea:(CGRect)rect adjustForStatusBar:(BOOL)adjust forInsets:(UIEdgeInsets) insets {
